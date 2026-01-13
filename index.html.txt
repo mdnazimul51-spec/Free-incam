@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Camera & Gallery Access</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f2f2f2;
+            padding: 20px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        video, img {
+            margin-top: 15px;
+            max-width: 90%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>📸 Camera & Gallery Access</h2>
+
+<button onclick="openCamera()">📷 ক্যামেরা চালু করুন</button><br>
+
+<video id="video" autoplay></video><br>
+
+<button onclick="takePhoto()">📸 ছবি তুলুন</button><br>
+<canvas id="canvas" style="display:none;"></canvas>
+<img id="photo"><br>
+
+<hr>
+
+<input type="file" accept="image/*" multiple onchange="loadGallery(this)">
+<div id="gallery"></div>
+
+<script>
+let stream;
+
+function openCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(s => {
+            stream = s;
+            document.getElementById("video").srcObject = stream;
+        })
+        .catch(() => {
+            alert("ক্যামেরা অনুমতি দেওয়া হয়নি");
+        });
+}
+
+function takePhoto() {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const photo = document.getElementById("photo");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    photo.src = canvas.toDataURL("image/png");
+}
+
+function loadGallery(input) {
+    const gallery = document.getElementById("gallery");
+    gallery.innerHTML = "";
+
+    for (let file of input.files) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.style.width = "100px";
+        img.style.margin = "5px";
+        gallery.appendChild(img);
+    }
+}
+</script>
+
+</body>
+</html>
